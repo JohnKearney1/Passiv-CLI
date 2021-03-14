@@ -1,4 +1,4 @@
-# [Passiv X](https://github.com/JohnKearney1/Passiv-X)
+# [Passiv X](https://johnkearney1.github.io/Passiv-X/)
 
 ## Abstract
 
@@ -11,11 +11,17 @@ Passiv instances. Passiv-X also includes a refactor of the package structure
 for easier setup, packaging, and distribution along with multi-version support.
 
 **Version:** [*A.001  {Alpha 001}*](https://github.com/JohnKearney1/Passiv-X/wiki)   
-**Note:** *Passiv X was borne from a fork of [passivbot_futures](https://github.com/enarjord/passivbot_futures) v2.1.3 by [@enarjord](https://github.com/enarjord).*  
-**Warning:** *Use at your own risk. You alone are liable for your usage of this tool. There may be bugs.*  
 
-**Wiki**: https://github.com/JohnKearney1/Passiv-X/wiki  
-*The Wiki contains detailed setup and usage instructions, as well as a detailed overview, FAQ and more!*
+
+- **Wiki**: https://github.com/JohnKearney1/Passiv-X/wiki *(The Wiki contains detailed setup and usage instructions, as well as a detailed overview, FAQ and more!)*
+
+- **Homepage**: https://johnkearney1.github.io/Passiv-X/
+- **GitHub**: https://github.com/JohnKearney1/Passiv-X
+
+
+**Warning:** *Use at your own risk. You alone are liable for your usage of this tool. There may be bugs.*
+
+**Note:** *Passiv-X was borne from a fork of [passivbot_futures](https://github.com/enarjord/passivbot_futures) v2.1.3 by [@enarjord](https://github.com/enarjord). The code has been heavily modified in structure and function for Passiv-X. For the time being, Passiv-X supports cross mode only, but will upgrade to include hedge mode once bugs have been threshed out and adequate documentation has been produced.*  
 
 #### Live Mode
 
