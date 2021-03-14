@@ -26,7 +26,7 @@ setup(
     version='2.1.0',
 
     # Set the website for the project
-    url='https://github.com/enarjord/passivbot_futures',
+    url='https://github.com/JohnKearney1/Passiv-X',
 
     # Set the License to License.md
     license=passivlicense,
@@ -62,7 +62,7 @@ setup(
         # Set compatibility
         'Operating System :: OS Independent',
 
-        # The client is intendend for PYTHON 3.8
+        # The client is intended for PYTHON 3.8
         'Programming Language :: Python :: 3.8 (Preferred) or above'
     ],
 

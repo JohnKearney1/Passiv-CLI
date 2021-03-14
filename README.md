@@ -1,163 +1,161 @@
-# Passiv Fork v2.5
-___
-
-**Version: 2.5.x**
-
-Passiv v2.5 is a fork of PassivBot-Futures by @enarjord
+# [Passiv X](https://github.com/JohnKearney1/Passiv-X)
 
 ___
+## Abstract
 
-
-   Passiv v2.5 is an unofficial version by @johnkearney1 with additional
+Passiv-X is a python implementation of a grid-style trading framework for algorithm generation, analysis, and market making.
+It supports trading on [Binance Perpetual Futures (USDs-T)](https://www.binance.com/en/futures)
+and [Bybit Inverse Perpetual Futures](https://www.bybit.com/en-US/contract-rules).
+Passiv-X is maintained by [@JohnKearney1](https://github.com/johnkearney1) with additional
 ease of use features, and will expand to include monitoring tools for your
-Passiv instances. Passiv v2.5 also includes a refactor of the package structure
-for easier setup, packaging, and distribution.
+Passiv instances. Passiv-X also includes a refactor of the package structure
+for easier setup, packaging, and distribution along with multi-version support.
 
-___
+**Version:** [*A.001  {Alpha 001}*](https://github.com/JohnKearney1/Passiv-X/wiki)   
+**Note:** *Passiv X was borne from a fork of [passivbot_futures](https://github.com/enarjord/passivbot_futures) v2.1.3 by [@enarjord](https://github.com/enarjord).*  
+**Warning:** *Use at your own risk. You alone are liable for your usage of this tool. There may be bugs.*  
 
-Usage:
+**Wiki**: https://github.com/JohnKearney1/Passiv-X/wiki  
+*The Wiki contains detailed setup and usage instructions, as well as a detailed overview, FAQ and more!*
 
+#### Live Mode
 
+Passiv-X's purpose is to accumulate Bitcoin (or another coin) on ByBit Inverse Futures and USDs-T Perpetual Futures. It is a market maker bot, creating multiple post-only limit orders above and below a given price, and uses an augmented martingale strategy to average into positions before closing at a specified profit percentage. It listens to a live websocket stream of trades using your API Keys, and updates its orders continuously based upon to the exchange's per-second rate limit. When there is no position, it enters either long or short depending on indicator settings if any are being used. This is done to scalp ambiguous price action and profit from indecision or market noise in between larger trades. Passiv-X may eventually contain multiple versions of itself, and some versions may utilize differing mechanics to trade. As such, they may require separate configuration, or additional setup. The manner in which the bot trades is defined largely by configuration files, containing key information on how Passiv should act in a given situation. These configurations can be downloaded from the [Configuration Repo](https://github.com/JohnKearney1/PassivBot-Configurations) or generated using the backtester.
 
 
-trading bot running on bybit inverse futures and binance usdt futures
+If there is a long position, it creates re-entry bids below the position price, and reduce-only asks above position price using the following formula:
 
-use at own risk
+`reentry_bid_price = pos_price * (1 - grid_spacing * (1 + (position_margin / wallet_balance) * grid_coefficient))`
 
-requires python >= 3.8
 
-dependencies, install with pip:
+If there is a short position, Passiv-X creates re-entry asks above the position price, and reduce-only closing bids below position price using the inverse formula:  
 
-`pip install -r requirements.txt`
+`reentry_ask_price = pos_price * (1 + grid_spacing * (1 + (position_margin / wallet_balance) * grid_coefficient))`
 
-discord
+#### Backtester
 
-https://discord.gg/QAF2H2UmzZ
+Passiv-X's backtester allows users to generate new configurations for the bot and save relevant test data. These backtested configurations can then be analyzed using [Jupyter-Lab](https://jupyter.org/) and the included `.ipynb` files. The backtester takes a variety of parameters from the user to help specify risk level, volatility tolerance, loss tolerance, average daily gain and more. The backtester will iterate through random settings, building a list of 'candidates' that fit your criteria. Jackrabbit, the engine for improving configurations, will slowly decrease the ranges for the best candidates until better ones are found that still fit your parameters. These iterations repeat up to a specified amount, and a `best_settings.json` configuration file is returned at the end. If no profitable configurations are found that meet your criteria, nothing is returned. In this case, you can re-test, or adjust your `backtesting_settings.hjson` to be more lenient. Note that your `backtesting_configs/backtesting_settings` is an hjson, while your `live_settings/{exchange}/live_settings.json` is a standard json file. This is done to accelerate the speed of backtesting, where **numpy** is used to speed up mathematical calculations.
 
-telegram
+Jackrabbit ("JR") is a pet name given to the simple algorithm for optimizing the bot's settings. JR iterates many backtests in succession, for each iteration, settings are mutated to new values within given a range defined in your backtesting_settings configuration file.If the new candidate's backtest yields a higher gain than best candidate's backtest, the superior settings becomes the parent of the next candidate.
+The mutation coefficient `m` determines the mutation range, and is inversely proportional to `k`, which is a simple counter for JR iterations. At first, new candidates will vary wildly from the best settings, while large ranges are 'scanned' for good results. Towards the end of the backtest (as `k` approaches `n_jackrabbit_iterations`) they begin will vary less, essentially "fine tuning" the parameters.
 
-https://t.me/passivbot_futures
+#### Backtesting Data Analysis
 
-for a repository of settings and their backtesting results, see
+[Jupyter-Lab](https://jupyter.org/) is used to analyze the results of a given backtest in detail. After completion, open `backtest_notes.ipynb` inside of Jupyter, using *`Passiv-X/Passiv-25/`* as your current working directory. In cell **[5]** edit the variable `backtest_config_name = 'YOURCONFIGHERE'` to match your backtest configuration file. After saving, return focus to cell **[1]** and step through the cells using *`Shift + Enter`*. Jupiter will display and save all generated data as PNG files in the directory of your backtest for later reference, and print the exact results of your test. As with any portion of this code, the backtest_notes can be modified to provide additional data for the user.
+___  
 
-https://github.com/JohnKearney1/PassivBot-Configurations
+## Usage  
 
-for more detailed documentation on this project, see the wiki at:
+#### Environment  
 
-https://github.com/enarjord/passivbot_futures/wiki
+Requirements:
+- Python >=3.8.x
+- Pip
 
-bybit ref:
-https://www.bybit.com/en-US/register?affiliate_id=16464&language=en-US&group_id=0&group_type=1
 
-binance ref:
-https://www.binance.cc/en/register?ref=TII4B07C
+Install the dependencies by using `pip install -r requirements.txt` from the root folder of Passiv-X.
 
-------------------------------------------------------------------
-change log
 
-2021-02-23 v2.0.0_beta
-- major update to backtester
-- new backtest usage syntax
-- other changes
+#### Setup Exchange Connection
 
-2021-02-27 v2.0.0
-- bug fixes
-- new default configs for bybit and binance
+On the exchange of your choice, create and save a new API keypair.
+You can name the API anything you like, although it is suggested to use a new account.
+While the bot is running, executing manual trades may throw off the bot and cause losses or liquidation.
+Add your API keys using the CLI menu:
 
-2021-02-28 v2.0.1
-- added optional just-in-time compiling for faster backtesting
+In the directory `Passiv-X`, run the command: `python3 main.py`
 
-2021-03-01 v2.0.2
-- more jit'ed calcs
 
-2021-03-02 v2.0.3
-- new default bybit config
-- behavior change: reentry qtys may now be smaller than initial entry qty
-- backtest iterates a numpy array instead of a python list of dicts for reduced ram usage
+        ...
 
-see `changelog.txt` for earlier changes
+        ____________________________________________________
 
+        __________                      __       ____  __
+        \______   \____    ______ ________|__  __\   \/ /
+          |     ___/__  \  /  ___//  ___/  |  \/ / \    /
+          |    |    / __ \_\___ \ \___ \|  |\   /  /    \
+          |____|   (____  /____  \____  \__| \_/  /___/\ \
+                        \/     \/     \/                \/
 
 
-------------------------------------------------------------------
+          ____________________________________________________
 
-released freely -- anybody may copy, redistribute, modify, use for commercial, non-commercial, educational or non-educational purposes, censor, claim as one's own or otherwise do or not do whatever without permission from anybody
+                          | Main Menu |
 
-------------------------------------------------------------------
+          [1] PassivBot Live - Binance Perpetual Futures
+          [2] PassivBot Live - ByBit Inverse Perpetual Futures
+          [3] Backtest
+          [4] Settings
+          [5] Help
+          [6] Exit
 
-usage:
 
-supports exchanges bybit inverse and binance usdt futures
 
-add api key and secret as json file in dir `api_key_secret/{exchange}/your_user_name.json`
+          > 4
 
+select `[4] Settings` using: `4`
 
-formatted like this: `["KEY", "SECRET"]`
+          ...
 
+          What settings would you like to adjust?
+          __________________________________________________
 
-make a copy of `settings/{exchange}/default.json`
+          [1] API Keys (Users)
+          [2] Live Configurations
+          [3] Backtesting Configurations
+          [4] <- Back
 
-rename the copy `your_user_name.json` and make desired changes
 
-run in terminal: `python3 start_bot.py exchange your_user_name`
+          > 1
 
-------------------------------------------------------------------
-overview
+Select `[1] API Keys (Users)` using: `1`
 
-the bot's purpose is to accumulate btc (or another coin) in bybit inverse and usdt in binance usdt futures
+          ...
 
-it is a market maker bot, making multiple post only limit orders above and below price
+          [1] Add API Key
+          [2] View Keys
 
-it listens to websocket live stream of trades, and updates its orders continuously
+          >
 
-when there is no position, it enters either long or short depending on indicator settings
+Select `[1] Add API Key` using: `1`
 
-if there is a long position, it creates reentry bids below pos price, and reduce-only asks above pos price
+You will be prompted to upload or add a new API Keyfile. The default format for the API Keyfile is a `.json` file where the filename is the User's name or configuration name. If you don't know your configuration name yet, assign an arbitrary name you can copy later. No spaces are allowed.
 
-reentry_bid_price = pos_price * (1 - grid_spacing * (1 + (position_margin / wallet_balance) * grid_coefficient))
+**Format**: `["KEY", "SECRET"]`
 
-inversely,
+More information is available on the [Wiki](https://github.com/JohnKearney1/Passiv-X/wiki).
 
-if there is a short position, it creates reentry asks above pos price, and reduce-only closing bids below pos price
+#### Selecting a Configuration  
 
-reentry_ask_price = pos_price * (1 + grid_spacing * (1 + (position_margin / wallet_balance) * grid_coefficient))
+When selecting a configuration, you may either use the included backtester to generate a new config, or you can use a pre-made configuration from the 'v2.0.0' directory of the [Configuration Repo](https://github.com/JohnKearney1/PassivBot-Configurations). These configurations may be untested, unstable, unprofitable, outdated, or the inverse. They are provided with test data to provide a set of comparable data to ensure you are correctly generating configurations. If you find a configuration you'd like to share, it can be submitted for addition to the repository.
 
+Information on usage of the backtester is detailed on the [Wiki](https://github.com/JohnKearney1/Passiv-X/wiki). As the process is relatively complex, it's recommended to run backtests from a local environment, and not on a cloud instance, VPC, VPS or otherwise.
 
-------------------------------------------------------------------
+When uploading or adding a configuration, you should name it after your API KeyFile. If you have multiple configs for one account, add multiple API KeyFiles with differing names but identical content to match the config list. For example, if you have a configuration named 'MY_BTCUSD_CONFIG', your API Key folder (`Passiv-25/api_key_secrets/{exchange}/`) should also include an API KeyFile with the name 'MY_BTCUSD_CONFIG'.
 
-a backtester is included
 
-go to `backtest_configs/{config_name}.hjson` and adjust
+#### Running Passiv-X
 
-run with 
+You can launch Passiv-X in live mode using the CLI menu. Simply run `python3 main.py` from the root directory (Passiv-X/).  
 
-`python3 backtest.py {config_name}`
+If you wish to bypass the CLI menu, you may run the bot from the package directory (Passiv-X/Passiv-25/) using `python3 start_bot.py {exchange} {config_name}`.
 
-add argument --jit to use numba's just in time compiler for faster backtesting:
+To run the backtester, configure your `backtesting_settings.hjson` as defined in the wiki, then run the `python3 backtest.py {backtesting_settings_filename}`. Optionally, append `--jit` to utilize code acceleration. Note, it is not necessary to add the file extension (.hson) to the backtesting_settings_filename in executing the command.
 
-`python3 backtest.py {config_name} --jit`
 
-open backtest_notes.ipynb in jupyter notebook or jupiter-lab for plotting and analysis.
+#### Offload Live Bot to VPS/VPC
 
-jackrabbit is a pet name given to a simple algorithm for optimizing bot's settings.
+Running Passiv-X from a VPS instance is easy! When reference to the "live" bot is made, it simply refers to an instance of the bot that been cloned, and filled with the necessary configurations and API keys to run "live" on your account, using real money, without additional configuration. When reference to the "test" bot is made, it refers to a local instance used primarily for generating and analyzing new configurations. There is no difference between the code of these instances, just the configurations and KeyFiles.
 
-it iterates many backtests in succession, for each iteration, settings are mutated to new values within given range defined in backtest config.
+Offloading your live bot to a cloud provider such as [Digital Ocean](https://www.digitalocean.com/) or [Amazon Web Services](https://aws.amazon.com/) is easy. Simply upload a zipped copy of your pre-configured instance of Passiv-X to your instance, set the region based upon the latency from the exchange's servers, unzip, and run.
 
-if the new candidate's backtest yields higher gain than best candidate's backtest,
+More information is available on the [Wiki](https://github.com/JohnKearney1/Passiv-X/wiki).
 
-the superior settings becomes the parent of the next candidate.
+____
 
-the mutation coefficient m determines the mutation range, and is inversely proportional to k, which is a simple counter.
+### Reference "Live" Configuration: ByBit Inverse
 
-in other words, at first new candidates will vary wildly from the best settings, towards the end they will vary less, "fine tuning" the parameters.
-
-see wiki for more info on backtesting
-
-------------------------------------------------------------------
-
-about live settings, bybit example:
-
-{
+    {
 
     "balance_pct": 0.5,                   # if settings["balance_pct"] = 1.0, will use 100% of balance.
                                           # if settings["balance_pct"] = 0.35, will us 35% of balance.
@@ -174,12 +172,12 @@ about live settings, bybit example:
                                           # binance ETHUSDT example:
                                           # if "entry_qty_pct" is set to 0.07, last price is 1100, leverage is 33 and wallet balance is 40 usdt,
                                           # initial_entry_qty = (40 / 1100) * 33 * 0.07 == 0.084.  rounded down is 0.084 eth.
-    
+
     "ddown_factor": 0.02,                 # next reentry_qty is max(initial_entry_qty, abs(pos_size) * ddown_factor).
                                           # if set to 1.0, each reentry qty will be equal to 1x pos size, i.e. doubling pos size after every reentry.
                                           # if set to 1.5, each reentry qty will be equal to 1.5x pos size.
                                           # if set to 0.0, each reentry qty will be equal to initial_entry_qty.
-                                          
+
     "indicator_settings": {
         "tick_ema": {                     # tick ema is not based on ohlcvs, but calculated based on sequence of raw trades.
             "span": 10000,                # if no pos, bid = min(ema * (1 - spread), highest_bid) and ask = max(ema * (1 + spread), lowest_ask)
@@ -191,15 +189,15 @@ about live settings, bybit example:
         "do_long": true,                  # if true, will allow long positions
         "do_shrt": true                   # if true, will allow short posisions
     },
-                                          
+
     "grid_coefficient": 245.0,            # next entry price is pos_price * (1 +- grid_spacing * (1 + (pos_margin / balance) * grid_coefficient)).
-    "grid_spacing": 0.0026,               # 
-                                          
+    "grid_spacing": 0.0026,               #
+
     "stop_loss_liq_diff": 0.02,           # if difference between liquidation price and last price is less than 2%, ...
     "stop_loss_pos_price_diff": 0.04,     # ... or if difference between pos price and last price is greater than 4%, reduce position by 2% at a loss,
 
     "stop_loss_pos_reduction": 0.02,      # reduce position by 2% at a loss.
-    
+
     "leverage": 100,                      # leverage (irrelevant in bybit because cross mode in is always max leverage).
     "logging_level": 0,                   # if logging_level > 0,
                                           # will log positions, open orders, order creations and order cancellations in logs/{exchange}/{config_name}.log.
@@ -207,32 +205,11 @@ about live settings, bybit example:
     "min_markup": 0.0002,                 # when there's a position, bot makes a grid of n_close_orders whose prices are
     "max_markup": 0.0159,                 # evenly distributed between min and max markup, and whose qtys are pos_size // n_close_orders.
     "min_close_qty_multiplier": 0.5       # min_close_qty = max(min_qty, initial_entry_qty * min_close_qty_multiplier)
-    
+
     "market_stop_loss": false,            # if true will soft stop with market orders, if false soft stops with limit orders at order book's higest_bid/lowest_ask
-                                          
+
     "n_close_orders": 20,                 # max n close orders.
     "n_entry_orders": 8,                  # max n entry orders.
     "symbol": "BTCUSD"                    # only one symbol at a time.
 
-}
- 
-
-------------------------------------------------------------------
-
-feel free to make a donation to show support of the work
-
-XMR: 49gUQ1jasDK23tJTMCvP4mQUUwndeLWAwSgdCFn6ovmRKXZAjQnVp2JZ2K4UuDDdYMNam1HE8ELZoWdeJPRfYEa9QSEK6XZ
-
-Nano: nano_1nf3knbhapee5ruwg7i8sqekx3zmifdeijr8495t9kgp3uyunik7b9cuyhf5
-
-EOS: nbt4rhnhpjan
-
-XLM: GDSTC6KQR6BCTA7BH45B3MTSY52EVZ4UZTPZEBAZHJMJHTUQQ5SM57S7
-
-USDT TRC20 (binance): TJr3KYY8Bz7wRU7QLwoYQHk88LcaBJqQN5
-
-bybit ref:
-https://www.bybit.com/en-US/register?affiliate_id=16464&language=en-US&group_id=0&group_type=1
-
-binance ref:
-https://www.binance.cc/en/register?ref=TII4B07C
+    }
