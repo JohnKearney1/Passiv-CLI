@@ -10,7 +10,7 @@ ease of use features, and will expand to include monitoring tools for your
 Passiv instances. Passiv-X also includes a refactor of the package structure
 for easier setup, packaging, and distribution along with multi-version support.
 
-**Version:** [*A.001  {Alpha 001}*](https://github.com/JohnKearney1/Passiv-X/wiki)   
+**Version:** [*A.001  {Alpha 001}*](https://github.com/JohnKearney1/Passiv-X/releases/)   
 
 
 - **Wiki**: https://github.com/JohnKearney1/Passiv-X/wiki *(The Wiki contains detailed setup and usage instructions, as well as a detailed overview, FAQ and more!)*
