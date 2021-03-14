@@ -1,6 +1,5 @@
 # [Passiv X](https://github.com/JohnKearney1/Passiv-X)
 
-___
 ## Abstract
 
 Passiv-X is a python implementation of a grid-style trading framework for algorithm generation, analysis, and market making.
